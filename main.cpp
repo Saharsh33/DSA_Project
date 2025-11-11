@@ -3,6 +3,8 @@
 #include "./String_helpers/String_helpers.h"
 #include "./Artist_Tokenization/Artist_tokenization.h"
 #include "./Trie/Trie.h"
+#include "./SearchFunc/SearchFunc.h"
+
 using namespace std;
 
 int main()
