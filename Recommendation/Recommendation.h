@@ -1,0 +1,21 @@
+#ifndef RECOMMENDATION_H
+#define RECOMMENDATION_H
+
+#include <bits/stdc++.h>
+using namespace std;
+
+#include "../Globals/Globals.h"
+#include "../Artist_Tokenization/Artist_tokenization.h"
+#include "../GraphCache/GraphCache.h"
+#include "../String_helpers/String_helpers.h"
+
+// declaration of functions
+double cosineSim(const vector<double> &a, const vector<double> &b);
+
+vector<double> getGenreVec(const string &genre);
+vector<double> getArtistVec(const string &artist);
+//build graph and feature vectors
+void buildFeatureVectors();
+void buildGraph();
+
+#endif // RECOMMENDATION_H
