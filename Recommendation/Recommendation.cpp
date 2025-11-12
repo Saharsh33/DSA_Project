@@ -92,3 +92,45 @@ void buildGraph()
     else
         cout << "Warning: Could not save graph cache.\n";
 }
+//Compute recommendation score when a song at index curr is played and we want to recommend song at index i.
+double computePairRecommendationScore(int cur, int i,
+                                      double Pmax, double Tmax, double Wmax)
+{
+    if (cur < 0 || cur >= (int)songs.size() || i < 0 || i >= (int)songs.size())
+        return 0.0;
+    double alpha = 0.20;   // graph similarity weight
+    double beta  = 0.10;   // popularity weight
+    double gamma = 0.15;   // genre similarity weight
+    double delta = 0.35;   // artist similarity weight
+    double eta   = 0.10;   // diversity weight
+    double zeta  = 0.10;   // trending weight
+
+    double Ci = 0.0;// graph similarity score
+    if (graph.count(cur))
+    {
+        for (auto &e : graph[cur])
+            if (e.first == i)
+            {
+                if (Wmax > 0)
+                    Ci = e.second / Wmax;
+                else
+                    Ci = e.second;
+                break;
+            }
+    }
+    double Pn = 0.0;// normalized popularity score
+    if (Pmax > 0)
+        Pn = log(1 + songs[i].play_count) / log(1 + Pmax);
+    //genre similarity score
+    double Gi = cosineSim(getGenreVec(songs[i].genre), getGenreVec(songs[cur].genre));
+    //artist similarity score
+    double Ai = cosineSim(getArtistVec(songs[i].artist), getArtistVec(songs[cur].artist));
+    //trending score
+    double Ti = (Tmax > 0 ? songs[i].trending_score / Tmax : 0.0);
+    //diversity score (1 - weighted genre and artist similarity)
+    double Di = 1.0 - (0.5 * Gi + 0.5 * Ai);
+    //final recommendation score
+    double S = alpha * Ci + beta * Pn + gamma * Gi + delta * Ai + eta * Di + zeta * Ti;
+    
+    return S;
+}
