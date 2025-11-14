@@ -2,6 +2,9 @@
 
 A high-performance C++17 music management application featuring intelligent song recommendations powered by graph-based similarity algorithms, advanced data structures, and efficient caching mechanisms.
 
+**CSL2020 Data Structures & Algorithms - Major Project**  
+*Indian Institute of Technology Jodhpur*
+
 ## Overview
 
 This system provides a comprehensive solution for managing music libraries with smart recommendations. It combines multiple data structures and algorithms to deliver fast search, efficient playlist management, and personalized song suggestions based on listening patterns and metadata similarity.
@@ -181,6 +184,13 @@ g++ -std=c++17 main.cpp `
 # Run the application
 .\musicplayer.exe
 ```
+
+### Alternative: Single Line Build
+
+```bash
+g++ -std=c++17 main.cpp Globals/Globals.cpp playlist_management/playlist_managment.cpp PlaylistOps/PlaylistOps.cpp String_helpers/String_helpers.cpp Artist_Tokenization/Artist_tokenization.cpp SaveSong/SaveSong.cpp SavePlaylist/SavePlaylist.cpp GraphCache/GraphCache.cpp Trie/Trie.cpp SearchFunc/SearchFunc.cpp Recommendation/Recommendation.cpp Queue_Management/QManage.cpp PlaySong/PlaySong.cpp QueueNavigation/QNav.cpp -o musicplayer && ./musicplayer
+```
+
 ## Usage
 
 The application provides an interactive command-line interface with the following operations:
@@ -223,3 +233,5 @@ These files enable persistence across sessions and reduce computation overhead.
 - **Vishwajeet Parmar** - B24CS1089
 
 ---
+
+**Repository**: [https://github.com/Saharsh33/CSL2020](https://github.com/Saharsh33/CSL2020)
