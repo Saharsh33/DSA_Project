@@ -57,7 +57,7 @@ Globals, Playlist Management, PlaylistOps, String Helpers, Artist Tokenization, 
 Cosine similarity measures how close two songs are based on their **genre vectors** and **artist vectors**.
 
 $$
-CosineSim(A,B) = \frac{A \cdot B}{||A|| \; ||B||}
+CosineSim(A,B) = \frac{A \cdot B}{||A|| \cdot ||B||}
 $$
 
 - Genres → one-hot vectors  
