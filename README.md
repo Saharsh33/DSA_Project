@@ -119,10 +119,12 @@ The top K songs with highest `FinalScore` are selected using a max-heap for effi
 ### Prerequisites
 
 - **Compiler**: GCC 7+, Clang 5+, or any C++17 compliant compiler
-- **Operating System**: macOS or Linux
+- **Operating System**: Windows, macOS, or Linux
 - **Git**: For cloning the repository
 
-### Compilation (macOS / Linux)
+### Compilation
+
+#### macOS / Linux
 
 ```bash
 # Clone the repository
@@ -151,6 +153,34 @@ g++ -std=c++17 main.cpp \
 ./musicplayer
 ```
 
+#### Windows
+
+```powershell
+# Clone the repository
+git clone https://github.com/Saharsh33/CSL2020.git
+cd CSL2020
+
+# Compile with C++17 standard
+g++ -std=c++17 main.cpp `
+    Globals/Globals.cpp `
+    playlist_management/playlist_managment.cpp `
+    PlaylistOps/PlaylistOps.cpp `
+    String_helpers/String_helpers.cpp `
+    Artist_Tokenization/Artist_tokenization.cpp `
+    SaveSong/SaveSong.cpp `
+    SavePlaylist/SavePlaylist.cpp `
+    GraphCache/GraphCache.cpp `
+    Trie/Trie.cpp `
+    SearchFunc/SearchFunc.cpp `
+    Recommendation/Recommendation.cpp `
+    Queue_Management/QManage.cpp `
+    PlaySong/PlaySong.cpp `
+    QueueNavigation/QNav.cpp `
+    -o musicplayer.exe
+
+# Run the application
+.\musicplayer.exe
+```
 ## Usage
 
 The application provides an interactive command-line interface with the following operations:
@@ -193,5 +223,3 @@ These files enable persistence across sessions and reduce computation overhead.
 - **Vishwajeet Parmar** - B24CS1089
 
 ---
-
-**Repository**: [https://github.com/Saharsh33/CSL2020](https://github.com/Saharsh33/CSL2020)
