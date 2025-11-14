@@ -1,200 +1,124 @@
-# CSL2020 – Major Project  
-**Data Structures & Algorithms**  
-**Indian Institute of Technology Jodhpur**
+# Music Management & Recommendation System
 
-## 📘 Introduction
-This repository contains the **Major Project** for the course **CSL2020: Data Structures & Algorithms** at **IIT Jodhpur**.  
-The project demonstrates the implementation of several fundamental and advanced **data structures**, **graph algorithms**, and **recommendation logic**, with a strong emphasis on correctness, efficiency, and modular design.
+A high-performance C++17 application for managing music libraries and generating intelligent song recommendations using advanced data structures and graph-based similarity algorithms.
 
-Our goal was to build a complete system that integrates:
-- Efficient data storage using appropriate data structures  
-- Smart traversal, searching, and sorting techniques  
-- Mathematical modeling (trending score, recommendation ranking)  
-- Graph theory concepts for similarity finding  
+## Features
 
----
+### Core Functionality
+- **Song Storage & Metadata Management**: Efficient storage and retrieval of song information including title, artist, genre, and play statistics
+- **Playlist Management**: Create, edit, and organize custom playlists with full CRUD operations
+- **Playback Queue**: Circular queue implementation for seamless continuous playback
+- **Smart Search**: Trie-based prefix search for ultra-fast song and artist lookups
+- **Artist Tokenization**: Intelligent parsing and indexing of artist names for improved search accuracy
 
-## 🚀 Project Highlights
-- A complete music-management + recommendation system  
-- Efficient playlist handling using **Doubly Linked Lists**  
-- Song queues managed using **Circular Queues**  
-- Artist token processing using **Hash Maps**  
-- Graph-based recommendation system using **Adjacency Lists**, **BFS**, **Similarity Scoring**  
-- Trending score calculation using mathematical normalization  
+### Recommendation Engine
+- **Graph-Based Similarity**: Precomputed similarity scores cached to disk (`graph_cache.dat`) for instant recommendations
+- **Multi-Factor Ranking**: Weighted algorithm considering artist overlap, genre matching, and play count patterns
+- **Trending Analysis**: Dynamic trending score calculation based on popularity and recency
+- **Top-K Recommendations**: Priority queue-based selection of most relevant songs
 
----
+## Data Structures
 
-# **📂 Data Structures Used (With Purpose + Explanation + Formulas)**
+The system leverages multiple advanced data structures for optimal performance:
 
-## **1. Doubly Linked List (Playlist Management)**
-Used to maintain a playlist where songs can be:
-- Added efficiently  
-- Removed efficiently  
-- Traversed forward/backward  
+- **Doubly Linked List**: Playlist and queue management with bidirectional traversal
+- **Circular Queue**: Efficient playback queue with O(1) enqueue/dequeue operations
+- **Trie**: Prefix-based search with O(m) lookup time where m is query length
+- **Hash Maps**: Fast metadata indexing and retrieval
+- **Graph Cache**: Disk-backed similarity matrix for persistent storage
+- **Priority Queue (Heap)**: Top-K recommendation selection in O(n log k) time
 
-### **Why this structure?**  
-O(1) insertion & deletion when pointer is known.
+## Algorithms
 
-### **Operations**
-| Operation | Complexity |
-|----------|------------|
-| Insert at head/tail | O(1) |
-| Delete a node | O(1) |
-| Traverse | O(n) |
+### Song Similarity Calculation
 
----
+The similarity between two songs A and B is computed using a weighted multi-factor formula:
 
-## **2. Circular Queue (Song Playing Queue)**
-Used to maintain the **play queue**, ensuring:
-- FIFO behavior  
-- Constant-time insertion & deletion  
-- Memory-efficient wrap-around  
+```math
+\text{Similarity}(A, B) = w_1 \cdot \text{ArtistMatch} + w_2 \cdot \text{GenreMatch} + w_3 \cdot \left(1 - \frac{|\text{PlayCount}_A - \text{PlayCount}_B|}{\text{MaxPlayCount}}\right)
+```
 
-### **Mathematical Model (Index Wrapping)**  
-If `rear` moves past end:
+Where:
+- `ArtistMatch` ∈ {0, 1} indicates artist overlap
+- `GenreMatch` ∈ {0, 1} indicates genre match
+- `w₁, w₂, w₃` are tunable weight parameters (w₁ + w₂ + w₃ = 1)
 
-\[
-rear = (rear + 1) \mod capacity
-\]
+### Score Normalization
 
-Same for `front`.
+All similarity scores are normalized to [0, 1] range:
 
-### **Complexities**
-| Operation | Complexity |
-|----------|------------|
-| enqueue | O(1) |
-| dequeue | O(1) |
-| peek | O(1) |
+```math
+\text{Norm}(x) = \frac{x - x_{\min}}{x_{\max} - x_{\min}}
+```
 
----
+### Trending Score
 
-## **3. Hash Map (Artist Tokenization + Song Lookup)**
-Used to store:
-- Artist → list of songs  
-- Song title → song object  
+Trending songs are identified using play count and recency:
 
-### **Why Hash Map?**  
-Average O(1) lookup.
+```math
+\text{TrendingScore} = \alpha \cdot \log(1 + \text{PlayCount}) + \beta \cdot \text{RecencyFactor}
+```
 
-### **Hashing Formula**
-The polynomial rolling hash function:
+Where:
+- `α` controls the weight of popularity
+- `β` controls the weight of recency
+- `RecencyFactor` decreases exponentially with time since last played
 
-\[
-H(s) = (s_0 \cdot p^{0} + s_1 \cdot p^{1} + \ldots + s_{n-1} \cdot p^{n-1}) \mod m
-\]
+### Final Recommendation Score
 
-Common choices:  
-`p = 31` or `53`, `m = 1e9+7`
+The final ranking combines similarity with graph distance:
 
----
+```math
+\text{RankFactor} = \frac{1}{1 + \text{Distance}}
+```
 
-## **4. Adjacency List Graph (Song Recommendation Engine)**  
-Graph nodes = songs  
-Edges = similarity based on:
-- Artist  
-- Genre  
-- Play count  
-- User interaction  
+```math
+\text{FinalScore} = \text{Similarity} \cdot \text{RankFactor}
+```
 
-### **Why adjacency list?**  
-Space-efficient for sparse graphs.
+Higher scores indicate stronger recommendations. The top K songs are selected using a max-heap.
 
-### **Similarity Edge Weight Formula**
-We designed a similarity score between song *A* and *B* as:
+## Installation
 
-\[
-Similarity(A, B) = w_1 \cdot GenreMatch + w_2 \cdot ArtistMatch + w_3 \cdot f(PlayCount)
-\]
+### Prerequisites
+- C++17 compatible compiler (GCC 7+, Clang 5+, or MSVC 2017+)
+- Git
 
-Where:  
-- `GenreMatch = 1 if same else 0`  
-- `ArtistMatch = 1 if same else 0`  
-- `f(PlayCount)` = normalized play difference:
+### Build Instructions
 
-\[
-f = 1 - \frac{|P_A - P_B|}{\max(P)}
-\]
+```bash
+git clone https://github.com/Saharsh33/CSL2020.git
+cd CSL2020
+g++ -std=c++17 */*.cpp main.cpp -o CSL2020App
+./CSL2020App
+```
 
-This score is stored as edge weight.
+## Usage
 
----
+Launch the application and follow the interactive menu to:
+1. Add songs to your library
+2. Create and manage playlists
+3. Search for songs and artists
+4. Get personalized recommendations
+5. View trending tracks
+6. Manage playback queue
 
-## **5. Graph Traversal (BFS for Recommendations)**
-Used to find recommended songs by exploring similar nodes.
+## Performance
 
-### **BFS Traversal Formula**
-Queue-driven exploration:
+- **Search**: O(m) where m is query length (Trie-based)
+- **Recommendations**: O(n log k) where n is library size and k is number of recommendations
+- **Playlist Operations**: O(1) for add/remove with doubly linked list
+- **Similarity Lookup**: O(1) with graph cache
 
-\[
-Queue.push(start)  
-\]
-\[
-while\ Queue\ not\ empty:\  
-\quad node = Queue.pop()  
-\quad push\ neighbors  
-\]
+## Authors
 
-BFS ensures closest (most similar) songs in the graph come first.
+- **Aditya Ranjan**
+- **Saharsh**
+
+## License
+
+This project is part of the CSL2020 coursework.
 
 ---
 
-## **6. Heap / Priority Queue (Top-K Trending Songs)**
-Trending songs sorted using **max-heap** based on trending score.
-
-### **Trending Score Formula**
-\[
-TrendingScore = \alpha \cdot \log(1 + playcount) + \beta \cdot recencyFactor
-\]
-
-Used to pick **top K** songs efficiently with complexity:
-
-\[
-O(n \log K)
-\]
-
----
-
-# **📊 Algorithms Used (With Purpose)**
-
-| Algorithm | Purpose | Complexity |
-|----------|----------|------------|
-| BFS | Graph-based recommendation | O(V + E) |
-| Heap (priority queue) | Top-K trending | O(n log k) |
-| Polynomial Hashing | Artist-token mapping | O(n) |
-| Sorting (Quicksort / Mergesort variant) | Trending order | O(n log n) |
-| Linked List ops | Playlist edit | O(1) |
-| Queue ops | Play order | O(1) |
-
----
-
-# **🧮 Mathematical Models Used**
-
-## **1. Normalization Function**
-Used to scale metrics (playcount, trending score):
-
-\[
-norm(x) = \frac{x - min(x)}{max(x) - min(x)}
-\]
-
-## **2. Weighted Similarity Score**
-\[
-Score = \sum_{i=1}^{n} w_i \cdot feature_i
-\]
-
-## **3. Logarithmic Popularity Adjustment**
-\[
-score = \log(1 + plays)
-\]
-
-Prevents large playcounts from overpowering small ones.
-
-## **4. BFS Layer Distance**
-Used to rank recommendations:
-
-\[
-Rank = \frac{1}{1 + Distance(level)}
-\]
-
----
-
-# 📁 Directory Structure
+**Repository**: [https://github.com/Saharsh33/CSL2020](https://github.com/Saharsh33/CSL2020)
