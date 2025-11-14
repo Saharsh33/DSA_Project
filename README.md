@@ -25,10 +25,14 @@ This system provides a comprehensive solution for managing music libraries with 
 - Persistent Storage  
 
 ### Recommendation Engine
-- Graph-based similarity  
+- Graph-based similarity
+- Cosine similarity for hot vectors
 - Multi-factor scoring  
-- Trending analysis  
-- Max-heap based top-K recommendation  
+- Trending analysis
+- Popularity analysis
+- Diversity analysis
+- Weighted score calculation 
+- Max-heap based top-7 recommendation  
 - Cached graph  
 
 ## Architecture
@@ -47,28 +51,125 @@ This system provides a comprehensive solution for managing music libraries with 
 ### Main Components
 Globals, Playlist Management, PlaylistOps, String Helpers, Artist Tokenization, SaveSong, SavePlaylist, GraphCache, Trie, SearchFunc, Recommendation, QueueManagement, PlaySong, QueueNavigation
 
-## Algorithms & Formulas (Exact)
+## Algorithms & Formulas (Detailed Explanation)
 
-### 1. Cosine Similarity
-CosineSim(A,B) = (A·B)/(||A||·||B||)
+### **1. Cosine Similarity (Gi & Ai)**  
+Cosine similarity is used to measure how similar two songs are based on their **genre vectors** and **artist vectors**.
 
-### 2. Graph Edge Similarity
-Sim = 0.5*GenreScore + 0.5*ArtistScore
+\[
+\text{CosineSim}(A,B) = \frac{A \cdot B}{||A|| \; ||B||}
+\]
 
-### 3. Graph Similarity (Ci)
-Ci = EdgeWeight(cur,i) / Wmax
+- Genres → one-hot vectors  
+- Artists → multi-hot normalized vectors  
+- Output range: **0 to 1**
 
-### 4. Popularity Score
-Pn = log(1+PlayCount)/log(1+Pmax)
+Used as:
+- **Gi** = genre similarity  
+- **Ai** = artist similarity  
 
-### 5. Trending Score
-Ti = TrendingScore_i / Tmax
 
-### 6. Diversity Score
-Di = 1 - (0.5Gi + 0.5Ai)
+---
 
-### 7. Final Score
+### **2. Graph Edge Similarity (During Graph Build)**  
+Each pair of songs gets a similarity score:
+
+\[
+Sim = 0.5 \cdot GenreScore + 0.5 \cdot ArtistScore
+\]
+
+Where:
+- **GenreScore = 1.0** if genres match, else **0.3**  
+- **ArtistScore = 1.0** if artist tokens overlap, else **0.5**
+
+Edges are added only when:
+
+\[
+Sim > 0.2
+\]
+
+This forms the recommendation graph.
+
+
+---
+
+### **3. Graph Similarity (Ci)**  
+
+\[
+Ci = \frac{\text{EdgeWeight(cur,i)}}{\text{WeightMax}}
+\]
+
+- **EdgeWeight(cur,i)** = similarity value from graph  
+- **WeightMax** = max weight in graph (normalization)  
+- If no edge exists → **Ci = 0**  
+
+
+---
+
+### **4. Popularity Score (Pn)**  
+
+\[
+Pn = \frac{\log(1 + \text{PlayCount}_i)}{\log(1 + \text{PlayCount}_{max})}
+\]
+
+- Uses logarithmic scaling  
+- Prevents extremely popular songs from dominating  
+- Normalized to **0–1**  
+
+
+---
+
+### **5. Trending Score (Ti)**  
+
+\[
+Ti = \frac{\text{TrendingScore}_i}{T_{\max}}
+\]
+
+- `TrendingScore_i` is precomputed per song  
+- `Tmax` = highest trending score  
+- Normalized to **0–1**  
+
+
+---
+
+### **6. Diversity Score (Di)**  
+
+\[
+Di = 1 - (0.5 \cdot Gi + 0.5 \cdot Ai)
+\]
+
+Purpose:
+- Encourages **variety**  
+- Penalizes songs that are too similar  
+- High Gi/Ai → low Di (less diversity)  
+- Low Gi/Ai → high Di (more diversity)  
+
+
+---
+
+### **7. Final Recommendation Score (S)**  
+
+Weighted combination of all factors:
+
+| Component           | Symbol | Weight |
+|--------------------|--------|--------|
+| Graph similarity   | Ci     | 0.20   |
+| Popularity         | Pn     | 0.10   |
+| Genre similarity   | Gi     | 0.15   |
+| Artist similarity  | Ai     | 0.35   |
+| Diversity          | Di     | 0.10   |
+| Trending           | Ti     | 0.10   |
+
+Final formula:
+
+\[
 S = 0.20Ci + 0.10Pn + 0.15Gi + 0.35Ai + 0.10Di + 0.10Ti
+\]
+
+Higher **S** → stronger recommendation.
+
+Top-K songs are extracted using a **max-heap** for efficiency.
+
 
 ## Build Instructions
 
